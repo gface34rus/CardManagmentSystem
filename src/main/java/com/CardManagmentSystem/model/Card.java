@@ -21,7 +21,7 @@ public class Card {
     private LocalDate expirationDate;
 
     @Enumerated(EnumType.STRING)
-    private CardStatus status; // Активна, Заблокирована, Истек срок действия
+    private CardStatus status;
 
     @Column(nullable = false)
     private BigDecimal balance;

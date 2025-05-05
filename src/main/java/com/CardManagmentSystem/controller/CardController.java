@@ -1,6 +1,7 @@
 package com.CardManagmentSystem.controller;
 
 import com.CardManagmentSystem.model.Card;
+import com.CardManagmentSystem.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

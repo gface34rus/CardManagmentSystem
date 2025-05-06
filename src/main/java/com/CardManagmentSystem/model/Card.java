@@ -2,8 +2,12 @@ package com.CardManagmentSystem.model;
 
 import jakarta.persistence.*;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
+import java.security.Key;
 import java.time.LocalDate;
+import java.util.Base64;
 import java.util.Objects;
 
 @Entity
@@ -27,6 +31,9 @@ public class Card {
     @Column(nullable = false)
     private BigDecimal balance;
 
+    private static final String ALGORITHM = "AES";
+    private static final String SECRET_KEY = "1234567890123456"; // Должен быть 16 символов для AES-128
+
     public Long getId() {
         return id;
     }
@@ -36,11 +43,11 @@ public class Card {
     }
 
     public String getCardNumber() {
-        return cardNumber;
+        return decrypt(cardNumber);
     }
 
     public void setCardNumber(String cardNumber) {
-        this.cardNumber = cardNumber;
+        this.cardNumber = encrypt(cardNumber);
     }
 
     public String getOwner() {
@@ -73,6 +80,38 @@ public class Card {
 
     public void setBalance(BigDecimal balance) {
         this.balance = balance;
+    }
+
+    public String getMaskedCardNumber() {
+        if (cardNumber == null || cardNumber.length() < 4) {
+            return "**** **** **** ****"; // Возвращаем маску, если номер карты некорректен
+        }
+        return "**** **** **** " + decrypt(cardNumber).substring(decrypt(cardNumber).length() - 4);
+    }
+
+    private String encrypt(String data) {
+        try {
+            Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+            byte[] encryptedData = cipher.doFinal(data.getBytes());
+            return Base64.getEncoder().encodeToString(encryptedData);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка шифрования", e);
+        }
+    }
+
+    private String decrypt(String encryptedData) {
+        try {
+            Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
+            Cipher cipher = Cipher.getInstance(ALGORITHM);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            byte[] decodedData = Base64.getDecoder().decode(encryptedData);
+            byte[] originalData = cipher.doFinal(decodedData);
+            return new String(originalData);
+        } catch (Exception e) {
+            throw new RuntimeException("Ошибка дешифрования", e);
+        }
     }
 
     @Override

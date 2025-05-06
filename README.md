@@ -20,7 +20,7 @@ Card Management System — это приложение для управлени
 Сначала клонируйте репозиторий на свой локальный компьютер:
 
 ```bash
-git clone <URL_вашего_репозитория>
+git clone <https://github.com/gface34rus/CardManagmentSystem>
 cd CardManagmentSystem
 2. Установка зависимостей
 Убедитесь, что у вас установлен Maven. Если он не установлен, следуйте инструкциям на официальном сайте Maven.

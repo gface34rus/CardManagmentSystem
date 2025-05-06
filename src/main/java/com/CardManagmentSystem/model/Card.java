@@ -3,6 +3,7 @@ package com.CardManagmentSystem.model;
 import jakarta.persistence.*;
 
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigDecimal;
 import java.security.Key;
@@ -33,6 +34,16 @@ public class Card {
 
     private static final String ALGORITHM = "AES";
     private static final String SECRET_KEY = "1234567890123456"; // Должен быть 16 символов для AES-128
+
+    public Card() {
+    }
+
+    public Card(String number, String owner, LocalDate localDate, BigDecimal bigDecimal) {
+        this.cardNumber = number;
+        this.owner = owner;
+        this.expirationDate = localDate;
+        this.balance = bigDecimal;
+    }
 
     public Long getId() {
         return id;
@@ -89,19 +100,25 @@ public class Card {
         return "**** **** **** " + decrypt(cardNumber).substring(decrypt(cardNumber).length() - 4);
     }
 
-    private String encrypt(String data) {
+    public static String encrypt(String data) {
         try {
             Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             byte[] encryptedData = cipher.doFinal(data.getBytes());
-            return Base64.getEncoder().encodeToString(encryptedData);
+            String encodedData = Base64.getEncoder().encodeToString(encryptedData);
+            System.out.println("Зашифрованные данные: " + encodedData); // Отладочное сообщение
+            return encodedData;
         } catch (Exception e) {
             throw new RuntimeException("Ошибка шифрования", e);
         }
     }
 
     private String decrypt(String encryptedData) {
+        if (encryptedData == null || encryptedData.isEmpty()) {
+            throw new IllegalArgumentException("Данные для дешифрования не могут быть null или пустыми");
+        }
+
         try {
             Key secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), ALGORITHM);
             Cipher cipher = Cipher.getInstance(ALGORITHM);
@@ -109,6 +126,8 @@ public class Card {
             byte[] decodedData = Base64.getDecoder().decode(encryptedData);
             byte[] originalData = cipher.doFinal(decodedData);
             return new String(originalData);
+        } catch (IllegalBlockSizeException e) {
+            throw new RuntimeException("Ошибка дешифрования: длина входных данных должна быть кратна 16", e);
         } catch (Exception e) {
             throw new RuntimeException("Ошибка дешифрования", e);
         }

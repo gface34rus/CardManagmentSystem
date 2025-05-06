@@ -11,26 +11,27 @@ import java.util.List;
 
 @Service
 public class CardService {
+
+    private final CardRepository cardRepository;
+
     @Autowired
-    private CardRepository cardRepository;
+    public CardService(CardRepository cardRepository) {
+        this.cardRepository = cardRepository; // Инициализация cardRepository
+    }
 
     public Card createCard(Card card) {
-        // Логика для создания карты
         return cardRepository.save(card);
     }
 
     public List<Card> getAllCards() {
-        // Логика для получения всех карт
         return cardRepository.findAll();
     }
 
     public Card getCardById(Long id) {
-        // Логика для получения карты по ID
         return cardRepository.findById(id).orElseThrow(() -> new RuntimeException("Card not found"));
     }
 
     public Card updateCard(Long id, Card card) {
-        // Логика для обновления карты
         Card existingCard = getCardById(id);
         existingCard.setOwner(card.getOwner());
         existingCard.setExpirationDate(card.getExpirationDate());
@@ -73,5 +74,4 @@ public class CardService {
         }
         return false;
     }
-
 }

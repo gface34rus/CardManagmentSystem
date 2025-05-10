@@ -19,17 +19,21 @@ public class CardService {
         this.cardRepository = cardRepository; // Инициализация cardRepository
     }
 
+
     public Card createCard(Card card) {
         return cardRepository.save(card);
     }
+
 
     public List<Card> getAllCards() {
         return cardRepository.findAll();
     }
 
+
     public Card getCardById(Long id) {
         return cardRepository.findById(id).orElseThrow(() -> new RuntimeException("Card not found"));
     }
+
 
     public Card updateCard(Long id, Card card) {
         Card existingCard = getCardById(id);
@@ -40,6 +44,7 @@ public class CardService {
         return cardRepository.save(existingCard);
     }
 
+
     public boolean deleteCard(Long id) {
         if (cardRepository.existsById(id)) {
             cardRepository.deleteById(id);
@@ -48,12 +53,14 @@ public class CardService {
         return false;
     }
 
+
     public boolean blockCard(Long id) {
         Card card = getCardById(id);
         card.setStatus(CardStatus.BLOCKED);
         cardRepository.save(card);
         return true;
     }
+
 
     public boolean activateCard(Long id) {
         Card card = getCardById(id);
